@@ -32,7 +32,7 @@ void Cycle()
     //calculate error and pid
     e = target_ticks - tick;
     E = E+e;
-    de = olde-e;
+    de = e-olde;
     PID = (kp*e)+(ki*E)+(kd*de);
     mapped = map(PID,minpid,maxpid,0,1023);
     analogWrite(pwmpin,mapped);
