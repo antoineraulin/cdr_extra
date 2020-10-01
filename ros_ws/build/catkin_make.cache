@@ -1,0 +1,2 @@
+PID
+-DCATKIN_DEVEL_PREFIX=/home/antoine/cdr_extra/ros_ws/devel -DCMAKE_INSTALL_PREFIX=/home/antoine/cdr_extra/ros_ws/install -G Unix Makefiles

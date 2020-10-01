@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/antoine/cdr_extra/ros_ws/install/setup.sh
