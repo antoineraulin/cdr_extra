@@ -26,6 +26,7 @@ long PID;//result of pid calc before mapping to pins
 int mapped;//mapped version of pid
 const int maxpid=4000;//max value of pid for mapping
 const int minpid=0;//min valu of pid use for mapping
+PID::IntArr_ reality_pub;
 
 //Communication
 const int bauderate = 38400;

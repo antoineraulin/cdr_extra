@@ -16,7 +16,8 @@ void setup(void)
   //encoder initialisation
   attachInterrupt(encoderpin,encoderInterrupt,RISING);
   //setting up pwm precision
-  analogWriteFrequency(pwmpin,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
+  analogWriteFrequency(pwmpin1,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
+  analogWriteFrequency(pwmpin2,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
   analogWriteResolution(10); // 0 - 255
   //ros here pls
 }
@@ -26,7 +27,11 @@ void loop(void)
   if(target_cycles != old_cycles){
     // create new message
     //publish new message
+    reality_pub.ticks = reality_ticks;
+    reality_pub.cycles = target_cycles;
+    pub_reality.publish(&reality_pub);
     old_cycles = target_cycles;
+    
   }
 }
 
@@ -37,6 +42,7 @@ void Cycle()
     motorbreak();
   }else if(target_cycles>0){
     //calculate error and pid
+
     e = target_ticks - tick;
     E = E+e;
     de = e-olde;
@@ -45,6 +51,7 @@ void Cycle()
     analogWrite(bucketpin,mapped);
     //reset
     olde = e;
+    reality_ticks = tick;
     tick = 0;
     target_cycles--;
   }
@@ -57,6 +64,8 @@ void encoderInterrupt(){
 
 void motorbreak(){
   //! A FAIRE PLUS TARD
+  digitalWrite(pwmpin1, HIGH);
+  digitalWrite(pwmpin2, HIGH);
 }
 void emergency_break_callback(const std_msgs::Bool &msg)
 {
