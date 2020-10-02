@@ -71,10 +71,10 @@ void emergency_break_callback(const std_msgs::Bool &msg)
 {
   emergency_break = msg.data;
 }
-void target_callback(const PID::IntArr_ &msg)
+void target_callback(const PID::IntArr &msg)
 {
-  target_ticks = msg.data.ticks;
-  target_cycles = msg.data.cycles;
+  target_ticks = msg.ticks;
+  target_cycles = msg.cycles;
   if(target_ticks > 0){
     bucketpin = pwmpin1;
     digitalWrite(pwmpin2, LOW);

@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <ros.h>
 #include <std_msgs/Bool.h>
-#include "IntArr.h"
+#include <PID/IntArr.h>
 #include "config.h"
 
 //CYCLE
@@ -26,7 +26,7 @@ long PID;//result of pid calc before mapping to pins
 int mapped;//mapped version of pid
 const int maxpid=4000;//max value of pid for mapping
 const int minpid=0;//min valu of pid use for mapping
-PID::IntArr_ reality_pub;
+PID::IntArr reality_pub;
 
 //Communication
 const int bauderate = 38400;
@@ -59,9 +59,9 @@ ros::Subscriber<std_msgs::Bool> sub_emergency_break(TOPIC_EMERGENCY_BREAK, &emer
 // speed target
 int desired_ticks = 0;
 int desired_cycles = 0;
-PID::IntArr_ target;
+PID::IntArr target;
 void target_callback(const PID::IntArr_ &msg);
-ros::Subscriber<PID::IntArr_> sub_target(TOPIC_TARGET, &target_callback);
+ros::Subscriber<PID::IntArr> sub_target(TOPIC_TARGET, &target_callback);
 
 
 // speed reality
