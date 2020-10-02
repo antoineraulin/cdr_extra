@@ -42,7 +42,7 @@ void Cycle()
     de = e-olde;
     PID = (kp*e)+(ki*E)+(kd*de);
     mapped = map(PID,minpid,maxpid,0,1023);
-    analogWrite(pwmpin,mapped);
+    analogWrite(bucketpin,mapped);
     //reset
     olde = e;
     tick = 0;
@@ -66,4 +66,13 @@ void target_callback(const PID::IntArr_ &msg)
 {
   target_ticks = msg.data.ticks;
   target_cycles = msg.data.cycles;
+  if(target_ticks > 0){
+    bucketpin = pwmpin1;
+    digitalWrite(pwmpin2, LOW);
+  }
+  else{
+    bucketpin = pwmpin2;
+    digitalWrite(pwmpin1, LOW);
+    target_ticks *= -1;
+  }
 }

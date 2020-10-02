@@ -37,7 +37,10 @@ const int encoderpin = 8;// pin for the encoder interrupt
 void encoderInterrupt();//isr for encoder
 
 // H-bridge
-const int pwmpin=10;//pin for H bridge pwm
+const int pwmpin1=10;//pin for H bridge pwm
+const int pwmpin2=11;//pin for H bridge pwm
+const int enable = 12; //pin for H bridge enable
+volatile int bucketpin = 10;
 void motorbreak();
 
 
