@@ -22,7 +22,7 @@ int de;//derived error or error variation
 const int kp=10;//proportional wheight
 const int ki=10;//integral wheight
 const int kd=1;//derivative wheight
-long PID;//result of pid calc before mapping to pins
+long PID_;//result of pid calc before mapping to pins
 int mapped;//mapped version of pid
 const int maxpid=4000;//max value of pid for mapping
 const int minpid=0;//min valu of pid use for mapping
@@ -51,19 +51,18 @@ void motorbreak();
 ros::NodeHandle nh;
 
 // emergency break
-const string TOPIC_EMERGENCY_BREAK = "/breakServo"; //topic name
+#define TOPIC_EMERGENCY_BREAK "/breakServo" //topic name
 void emergency_break_callback(const std_msgs::Bool &msg); 
-bool emergency_break = false;
 ros::Subscriber<std_msgs::Bool> sub_emergency_break(TOPIC_EMERGENCY_BREAK, &emergency_break_callback);
 
 // speed target
 int desired_ticks = 0;
 int desired_cycles = 0;
 PID::IntArr target;
-void target_callback(const PID::IntArr_ &msg);
+void target_callback(const PID::IntArr &msg);
 ros::Subscriber<PID::IntArr> sub_target(TOPIC_TARGET, &target_callback);
 
 
 // speed reality
-PID::IntArr_ reality;
+PID::IntArr reality;
 ros::Publisher pub_reality(TOPIC_REALITY, &reality);

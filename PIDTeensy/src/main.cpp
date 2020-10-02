@@ -46,8 +46,8 @@ void Cycle()
     e = target_ticks - tick;
     E = E+e;
     de = e-olde;
-    PID = (kp*e)+(ki*E)+(kd*de);
-    mapped = map(PID,minpid,maxpid,0,1023);
+    PID_ = (kp*e)+(ki*E)+(kd*de);
+    mapped = map(PID_,minpid,maxpid,0,1023);
     analogWrite(bucketpin,mapped);
     //reset
     olde = e;

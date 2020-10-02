@@ -1,3 +1,3 @@
 // topic names
-const string TOPIC_TARGET = "/right/target";
-const string TOPIC_REALITY = "/right/reality";
+#define TOPIC_TARGET "/right/target"
+#define TOPIC_REALITY "/right/reality"
