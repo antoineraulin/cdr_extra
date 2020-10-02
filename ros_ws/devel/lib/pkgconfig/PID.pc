@@ -5,4 +5,4 @@ Description: Description of PID
 Version: 0.0.0
 Cflags: -I/home/antoine/cdr_extra/ros_ws/devel/include
 Libs: -L${prefix}/lib 
-Requires: message_runtime
+Requires: rospy roscpp message_runtime
