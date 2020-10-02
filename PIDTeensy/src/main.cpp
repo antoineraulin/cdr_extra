@@ -4,6 +4,12 @@
 
 void setup(void)
 {
+  //ROS
+  nh.initNode(); //initialisation du Node ROS
+  nh.advertise(pub_reality); //advertise le topic de publication
+  nh.subscribe(sub_target); //on s'abonne à là où on va écouter
+  nh.subscribe(sub_emergency_break); //abonnement arrêt d'urgence
+
   //TIMER initialization
   Timer1.initialize(period); //initialisation du timer
   Timer1.attachInterrupt(Cycle); //attachInterrupt
@@ -13,14 +19,15 @@ void setup(void)
   analogWriteFrequency(pwmpin,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
   analogWriteResolution(10); // 0 - 255
   //ros here pls
-  Serial.begin(bauderate);//comm non ros
 }
 
 void loop(void)
 {
-  delay(1000);
-  Serial.println("------- 1 sec is over -------");
-  Serial.send_now();
+  if(target_cycles != old_cycles){
+    // create new message
+    //publish new message
+    old_cycles = target_cycles;
+  }
 }
 
 void Cycle()
@@ -28,7 +35,7 @@ void Cycle()
   cli(); //éteint les interrupts
   if(emergency_break){
     motorbreak();
-  }else if(target_duration>0){
+  }else if(target_cycles>0){
     //calculate error and pid
     e = target_ticks - tick;
     E = E+e;
@@ -39,12 +46,7 @@ void Cycle()
     //reset
     olde = e;
     tick = 0;
-    target_duration--;
-    //for debug
-    Serial.print(e);
-    Serial.print(" ");
-    Serial.println(PID);
-    Serial.send_now();
+    target_cycles--;
   }
   sei(); //relance les interrupts
 }
@@ -54,5 +56,14 @@ void encoderInterrupt(){
 }
 
 void motorbreak(){
-
+  //! A FAIRE PLUS TARD
+}
+void emergency_break_callback(const std_msgs::Bool &msg)
+{
+  emergency_break = msg.data;
+}
+void target_callback(const PID::IntArr_ &msg)
+{
+  target_ticks = msg.data.ticks;
+  target_cycles = msg.data.cycles;
 }
