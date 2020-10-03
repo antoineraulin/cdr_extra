@@ -5,7 +5,7 @@
 void setup(void)
 {
   //ROS
-  nh.initNode(); //initialisation du Node ROS
+  nh.initNode(teensyname); //initialisation du Node ROS
   nh.advertise(pub_reality); //advertise le topic de publication
   nh.subscribe(sub_target); //on s'abonne à là où on va écouter
   nh.subscribe(sub_emergency_break); //abonnement arrêt d'urgence
@@ -13,42 +13,49 @@ void setup(void)
   //TIMER initialization
   Timer1.initialize(period); //initialisation du timer
   Timer1.attachInterrupt(Cycle); //attachInterrupt
+  //pin init
+  pinMode(pin_pwr,OUTPUT);
+  pinMode(pin_dir1,OUTPUT);
+  pinMode(pin_dir2,OUTPUT);
+  pinMode(pin_encoder,INPUT);
   //encoder initialisation
-  attachInterrupt(encoderpin,encoderInterrupt,RISING);
+  attachInterrupt(digitalPinToInterrupt(pin_encoder),encoderInterrupt,RISING); //! slow must be changed to attachInterruptVector
+  //attachInterruptVector(,encoderInterrupt,RISING);
+  /*uint32_t mask = (0x09 << 16) | 0x01000000;//setup mask for rising edge
+  volatile uint32_t *config;
+  config = portConfigRegister(pin_encoder);
+  */
   //setting up pwm precision
-  analogWriteFrequency(pwmpin1,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
-  analogWriteFrequency(pwmpin2,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
+  analogWriteFrequency(pin_pwr,F_CPU/1E6);//setting up ideal frequency pedending on cpu frequency
   analogWriteResolution(10); // 0 - 255
-  //ros here pls
 }
 
-void loop(void)
+void loop(void) ///main loop
 {
   if(target_cycles != old_cycles){
     // create new message
-    //publish new message
     reality_pub.ticks = reality_ticks;
     reality_pub.cycles = target_cycles;
+    //publish new message
     pub_reality.publish(&reality_pub);
     old_cycles = target_cycles;
-    
   }
+  nh.spinOnce();
 }
 
-void Cycle()
+void Cycle()///called by the timer
 {
   cli(); //éteint les interrupts
   if(emergency_break){
     motorbreak();
   }else if(target_cycles>0){
     //calculate error and pid
-
     e = target_ticks - tick;
     E = E+e;
     de = e-olde;
     PID_ = (kp*e)+(ki*E)+(kd*de);
     mapped = map(PID_,minpid,maxpid,0,1023);
-    analogWrite(bucketpin,mapped);
+    analogWrite(pin_pwr,mapped);
     //reset
     olde = e;
     reality_ticks = tick;
@@ -63,25 +70,26 @@ void encoderInterrupt(){
 }
 
 void motorbreak(){
-  //! A FAIRE PLUS TARD
-  digitalWrite(pwmpin1, HIGH);
-  digitalWrite(pwmpin2, HIGH);
+  //! must be tested
+  digitalWrite(pin_dir1, HIGH);
+  digitalWrite(pin_dir2, HIGH);
 }
 void emergency_break_callback(const std_msgs::Bool &msg)
 {
   emergency_break = msg.data;
+  if(emergency_break){
+    motorbreak();
+  }else{
+    digitalWriteFast(pin_dir1,dir);
+    digitalWriteFast(pin_dir2,!dir);
+  }
 }
 void target_callback(const PID::IntArr &msg)
 {
   target_ticks = msg.ticks;
   target_cycles = msg.cycles;
-  if(target_ticks > 0){
-    bucketpin = pwmpin1;
-    digitalWrite(pwmpin2, LOW);
-  }
-  else{
-    bucketpin = pwmpin2;
-    digitalWrite(pwmpin1, LOW);
-    target_ticks *= -1;
-  }
+  dir = target_ticks>0;
+  target_ticks = abs(target_ticks);
+  digitalWriteFast(pin_dir1,dir);
+  digitalWriteFast(pin_dir2,!dir);
 }
