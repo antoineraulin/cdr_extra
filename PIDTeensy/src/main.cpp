@@ -71,8 +71,8 @@ void encoderInterrupt(){
 
 void motorbreak(){
   //! must be tested
-  digitalWrite(pin_dir1, HIGH);
-  digitalWrite(pin_dir2, HIGH);
+  digitalWriteFast(pin_dir1, HIGH);
+  digitalWriteFast(pin_dir2, HIGH);
 }
 void emergency_break_callback(const std_msgs::Bool &msg)
 {
